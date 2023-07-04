@@ -16,14 +16,12 @@ function App() {
 		setLoading(true);
 
 		const apiUrl = import.meta.env.VITE_Open_AI_Url;
-		const openaiApiKey = import.meta.env.VITE_Open_AI_Key;
 
 		try {
 			const response = await fetch(apiUrl, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
-					Authorization: `Bearer ${openaiApiKey}`,
 				},
 				body: JSON.stringify({
 					prompt: prompt,
@@ -72,20 +70,6 @@ function App() {
 						onChange={(e) => setQuantity(parseInt(e.target.value))}
 					/>
 					<span>{quantity}</span>
-					{/* 
-            <label htmlFor="imageSize">Image Size:</label>
-            <div className="select-container">
-              <select
-                id="imageSize"
-                value={imageSize}
-                onChange={(e) => setImageSize(e.target.value)}
-              >
-                <option value="256x256">256x256</option>
-                <option value="512x512">512x512</option>
-                <option value="1024x1024">1024x1024</option>
-              </select>
-            </div>
-          */}
 
 					<br />
 					<button onClick={generateImage}>Generate Images</button>

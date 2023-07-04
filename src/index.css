@@ -2,7 +2,7 @@
 	font-size: 16px;
 	line-height: 24px;
 	font-weight: 400;
-	color-scheme: light dark;
+	color-scheme: dark;
 	color: rgba(255, 255, 255, 0.87);
 }
 
@@ -36,7 +36,7 @@ span:focus {
 .image-container {
 	display: flex;
 	flex-wrap: wrap;
-	gap: 1px; /* Set the desired gap size */
+	gap: 1px;
 }
 
 .image-container img {
@@ -46,7 +46,7 @@ span:focus {
 
 @media screen and (-webkit-min-device-pixel-ratio: 0) {
 	.select-container select {
-		padding-right: 0.5em; /* Adjust as needed */
+		padding-right: 0.5em;
 		text-indent: 0.01px;
 		text-align: center;
 		text-align-last: center;
@@ -55,5 +55,5 @@ span:focus {
 
 .select-container select option {
 	text-align: left;
-	padding: 0.15em; /* Adjust as needed */
+	padding: 0.15em;
 }
