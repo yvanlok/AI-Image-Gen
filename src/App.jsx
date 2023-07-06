@@ -16,12 +16,13 @@ function App() {
 		setLoading(true);
 
 		const apiUrl = import.meta.env.VITE_Open_AI_Url;
-
+		const openaiApiKey = import.meta.env.VITE_Open_AI_Key;
 		try {
 			const response = await fetch(apiUrl, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
+					Authorization: `Bearer ${openaiApiKey}`,
 				},
 				body: JSON.stringify({
 					prompt: prompt,
