@@ -7,13 +7,15 @@ function App() {
 	const [result, setResult] = useState([]);
 	const [loading, setLoading] = useState(false);
 	const [placeholder, setPlaceholder] = useState(
-		"Search Bears with Paint Brushes the Starry Night, painted by Vincent Van Gogh..",
+		"Search Bears with Paint Brushes the Starry Night, painted by Vincent Van Gogh...",
 	);
 	const [quantity, setQuantity] = useState(3);
 	const [imageSize, setImageSize] = useState("1024x1024");
 
 	const generateImage = async () => {
-		setPlaceholder(`Search ${prompt}..`);
+		setImageSize(imageSize);
+		setPlaceholder(`Search ${prompt}...`);
+		setPrompt(prompt);
 		setLoading(true);
 
 		const apiUrl = import.meta.env.VITE_Open_AI_Url;
@@ -49,8 +51,25 @@ function App() {
 					<h2>Generating your unique images... Sit tight!</h2>
 					<div className="lds-ripple">
 						<div></div>
+
 						<div></div>
 					</div>
+					<br />
+					<a href="https://iproyal.com?r=free-ai" target="_blank">
+						<img
+							src="https://dashboard.iproyal.com/img/b/728_2.jpg"
+							alt="IPRoyal.com"
+						/>
+					</a>
+					<br />
+					<a href="https://dashboard.capsolver.com/passport/register?inviteCode=Ecv6Gtrh0ECa">
+						<img
+							alt="banner"
+							src="https://camo.githubusercontent.com/359a6866e8e9700c4cfa18e3bea8055e886772c93bc17618ea67ecfae8ca0d0d/68747470733a2f2f63646e2e646973636f72646170702e636f6d2f6174746163686d656e74732f313130353137323339343635353632353330362f313130353138303130313830323437313537352f32303232313230372d3136303734392e676966"
+						/>
+					</a>
+					<br />
+					<Banner />
 				</>
 			) : (
 				<>
@@ -72,6 +91,20 @@ function App() {
 						onChange={(e) => setQuantity(parseInt(e.target.value))}
 					/>
 					<span>{quantity}</span>
+					{/* <br />
+					<label htmlFor="imageSize">Image Size:</label>
+					<div className="select-container">
+						<select
+							id="imageSize"
+							value={imageSize}
+							onChange={(e) => setImageSize(e.target.value)}
+						>
+							<option value="256x256">256x256</option>
+							<option value="512x512">512x512</option>
+							<option value="1024x1024">1024x1024</option>
+						</select>
+					</div> 
+					*/}
 
 					<br />
 					<button onClick={generateImage}>Generate Images</button>
@@ -90,7 +123,7 @@ function App() {
 						<></>
 					)}
 					<br />
-					<a href="https://iproyal.com?r=241410" target="_blank">
+					<a href="https://iproyal.com?r=free-ai" target="_blank">
 						<img
 							src="https://dashboard.iproyal.com/img/b/728_2.jpg"
 							alt="IPRoyal.com"
