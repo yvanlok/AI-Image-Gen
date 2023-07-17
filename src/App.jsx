@@ -28,6 +28,7 @@ function App() {
 					Authorization: `Bearer ${openaiApiKey}`,
 				},
 				body: JSON.stringify({
+					model: "kandinsky",
 					prompt: prompt,
 					n: quantity,
 					size: imageSize,
@@ -73,6 +74,17 @@ function App() {
 				</>
 			) : (
 				<>
+					<div class="alert">
+						The ads are necessary to keep the website running. If
+						you see some strange ads, immediately report them to me.
+						You can also use an adblocker if it gets really
+						annoying. You may get redirected off the site at times.
+						Just switch back to this tab. If you really like ads and
+						want to support me, click {""}
+						<a href="https://magicianmost.com/zmijksentz?key=6f235258db24ba853f34b575ca568c09">
+							this.
+						</a>
+					</div>
 					<h2>Generate Images using AI</h2>
 					<textarea
 						className="app-input"
@@ -80,6 +92,13 @@ function App() {
 						onChange={(e) => setPrompt(e.target.value)}
 						rows="10"
 						cols="40"
+						autoFocus
+						onKeyDown={(e) => {
+							if (e.key === "Enter") {
+								e.preventDefault(); // Prevent a line break from being added to the textarea
+								document.getElementById("generate").click(); // Trigger a click event on the button
+							}
+						}}
 					/>
 					<label htmlFor="quantity">Number of Images:</label>
 					<input
@@ -91,23 +110,11 @@ function App() {
 						onChange={(e) => setQuantity(parseInt(e.target.value))}
 					/>
 					<span>{quantity}</span>
-					{/* <br />
-					<label htmlFor="imageSize">Image Size:</label>
-					<div className="select-container">
-						<select
-							id="imageSize"
-							value={imageSize}
-							onChange={(e) => setImageSize(e.target.value)}
-						>
-							<option value="256x256">256x256</option>
-							<option value="512x512">512x512</option>
-							<option value="1024x1024">1024x1024</option>
-						</select>
-					</div> 
-					*/}
 
 					<br />
-					<button onClick={generateImage}>Generate Images</button>
+					<button onClick={generateImage} id="generate">
+						Generate Images
+					</button>
 					{result.length > 0 ? (
 						<div className="image-container centered-div display-flex">
 							{result.map((image, index) => (
