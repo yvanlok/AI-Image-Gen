@@ -1,154 +1,110 @@
 import { useState } from "react";
 import "./App.css";
-import { Banner } from "./728_90";
+import { DisplayImages } from "./Images";
 
 function App() {
-	const [prompt, setPrompt] = useState("");
-	const [result, setResult] = useState([]);
-	const [loading, setLoading] = useState(false);
-	const [placeholder, setPlaceholder] = useState(
-		"Search Bears with Paint Brushes the Starry Night, painted by Vincent Van Gogh...",
-	);
-	const [quantity, setQuantity] = useState(3);
-	const [imageSize, setImageSize] = useState("1024x1024");
+    const [prompt, setPrompt] = useState("");
+    const [result, setResult] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [placeholder, setPlaceholder] = useState(
+        "Search Bears with Paint Brushes the Starry Night, painted by Vincent Van Gogh..."
+    );
+    const [quantity, setQuantity] = useState(3);
+    const [imageSize, setImageSize] = useState("1024x1024");
 
-	const generateImage = async () => {
-		setImageSize(imageSize);
-		setPlaceholder(`Search ${prompt}...`);
-		setPrompt(prompt);
-		setLoading(true);
+    const generateImage = async () => {
+        setImageSize(imageSize);
+        setPlaceholder(`Search ${prompt}...`);
+        setPrompt(prompt);
+        setLoading(true);
 
-		const apiUrl = import.meta.env.VITE_Open_AI_Url;
-		const openaiApiKey = import.meta.env.VITE_Open_AI_Key;
-		try {
-			const response = await fetch(apiUrl, {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-					Authorization: `Bearer ${openaiApiKey}`,
-				},
-				body: JSON.stringify({
-					model: "kandinsky",
-					prompt: prompt,
-					n: quantity,
-					size: imageSize,
-				}),
-			});
+        const apiUrl = import.meta.env.VITE_Open_AI_Url;
+        const openaiApiKey = import.meta.env.VITE_Open_AI_Key;
+        try {
+            const response = await fetch(apiUrl, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${openaiApiKey}`,
+                },
+                body: JSON.stringify({
+                    model: "kandinsky",
+                    prompt: prompt,
+                    n: quantity,
+                    size: imageSize,
+                }),
+            });
 
-			const data = await response.json();
+            const data = await response.json();
 
-			setLoading(false);
-			setResult(data.data);
-		} catch (error) {
-			setLoading(false);
-			console.log(error);
-		}
-	};
+            setLoading(false);
+            setResult(data.data);
 
-	return (
-		<div className="app-main">
-			{loading ? (
-				<>
-					<h2>Generating your unique images... Sit tight!</h2>
-					<div className="lds-ripple">
-						<div></div>
+            // Retrieve existing links from local storage
+            const existingLinks = JSON.parse(localStorage.getItem("imageLinks")) || [];
 
-						<div></div>
-					</div>
-					<br />
-					<a href="https://iproyal.com?r=free-ai" target="_blank">
-						<img
-							src="https://dashboard.iproyal.com/img/b/728_2.jpg"
-							alt="IPRoyal.com"
-						/>
-					</a>
-					<br />
-					<a href="https://dashboard.capsolver.com/passport/register?inviteCode=Ecv6Gtrh0ECa">
-						<img
-							alt="banner"
-							src="https://camo.githubusercontent.com/359a6866e8e9700c4cfa18e3bea8055e886772c93bc17618ea67ecfae8ca0d0d/68747470733a2f2f63646e2e646973636f72646170702e636f6d2f6174746163686d656e74732f313130353137323339343635353632353330362f313130353138303130313830323437313537352f32303232313230372d3136303734392e676966"
-						/>
-					</a>
-					<br />
-					<Banner />
-				</>
-			) : (
-				<>
-					<div class="alert">
-						The ads are necessary to keep the website running. If
-						you see some strange ads, immediately report them to me.
-						You can also use an adblocker if it gets really
-						annoying. You may get redirected off the site at times.
-						Just switch back to this tab. If you really like ads and
-						want to support me, click {""}
-						<a href="https://magicianmost.com/zmijksentz?key=6f235258db24ba853f34b575ca568c09">
-							this.
-						</a>
-					</div>
-					<h2>Generate Images using AI</h2>
-					<textarea
-						className="app-input"
-						placeholder={placeholder}
-						onChange={(e) => setPrompt(e.target.value)}
-						rows="10"
-						cols="40"
-						autoFocus
-						onKeyDown={(e) => {
-							if (e.key === "Enter") {
-								e.preventDefault(); // Prevent a line break from being added to the textarea
-								document.getElementById("generate").click(); // Trigger a click event on the button
-							}
-						}}
-					/>
-					<label htmlFor="quantity">Number of Images:</label>
-					<input
-						id="quantity"
-						type="range"
-						min="1"
-						max="10"
-						value={quantity}
-						onChange={(e) => setQuantity(parseInt(e.target.value))}
-					/>
-					<span>{quantity}</span>
+            // Extract new links from the data and append to existing links
+            const newLinks = data.data.map((image) => image.url);
+            const allLinks = [...newLinks, ...existingLinks];
 
-					<br />
-					<button onClick={generateImage} id="generate">
-						Generate Images
-					</button>
-					{result.length > 0 ? (
-						<div className="image-container centered-div display-flex">
-							{result.map((image, index) => (
-								<img
-									key={index}
-									className="result-image"
-									src={image.url}
-									alt={`result-${index}`}
-								/>
-							))}
-						</div>
-					) : (
-						<></>
-					)}
-					<br />
-					<a href="https://iproyal.com?r=free-ai" target="_blank">
-						<img
-							src="https://dashboard.iproyal.com/img/b/728_2.jpg"
-							alt="IPRoyal.com"
-						/>
-					</a>
-					<br />
-					<a href="https://dashboard.capsolver.com/passport/register?inviteCode=Ecv6Gtrh0ECa">
-						<img
-							alt="banner"
-							src="https://camo.githubusercontent.com/359a6866e8e9700c4cfa18e3bea8055e886772c93bc17618ea67ecfae8ca0d0d/68747470733a2f2f63646e2e646973636f72646170702e636f6d2f6174746163686d656e74732f313130353137323339343635353632353330362f313130353138303130313830323437313537352f32303232313230372d3136303734392e676966"
-						/>
-					</a>
-					<br />
-					<Banner />
-				</>
-			)}
-		</div>
-	);
+            // Save the updated links to local storage
+            localStorage.setItem("imageLinks", JSON.stringify(allLinks));
+        } catch (error) {
+            setLoading(false);
+            console.log(error);
+        }
+    };
+
+    return (
+        <div className="app-main">
+            {loading ? (
+                <>
+                    <h2>Generating your unique images... Sit tight!</h2>
+                    <div className="lds-ripple">
+                        <div></div>
+                        <div></div>
+                    </div>
+                    <br />
+                    <DisplayImages />
+                </>
+            ) : (
+                <>
+                    <h2>Generate Images using AI</h2>
+                    <textarea
+                        className="app-input"
+                        placeholder={placeholder}
+                        onChange={(e) => setPrompt(e.target.value)}
+                        rows="10"
+                        cols="40"
+                        autoFocus
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                                e.preventDefault(); // Prevent a line break from being added to the textarea
+                                document.getElementById("generate").click(); // Trigger a click event on the button
+                            }
+                        }}
+                    />
+                    <label htmlFor="quantity">Number of Images:</label>
+                    <input
+                        id="quantity"
+                        type="range"
+                        min="1"
+                        max="10"
+                        value={quantity}
+                        onChange={(e) => setQuantity(parseInt(e.target.value))}
+                    />
+                    <span>{quantity}</span>
+
+                    <br />
+                    <button onClick={generateImage} id="generate">
+                        Generate Images
+                    </button>
+                    <h4>Your gallery:</h4>
+                    <DisplayImages />
+                </>
+            )}
+        </div>
+    );
 }
 
 export default App;
