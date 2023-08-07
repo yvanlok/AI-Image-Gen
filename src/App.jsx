@@ -3,8 +3,9 @@ import "./App.css";
 import { DisplayImages } from "./Images";
 
 function App() {
+    const [rateLimitedMessage, setRateLimitedMessage] = useState(null);
+    const [rateLimited, setrateLimited] = useState(false);
     const [prompt, setPrompt] = useState("");
-    const [result, setResult] = useState([]);
     const [loading, setLoading] = useState(false);
     const [placeholder, setPlaceholder] = useState(
         "Search Bears with Paint Brushes the Starry Night, painted by Vincent Van Gogh..."
@@ -13,6 +14,7 @@ function App() {
     const [imageSize, setImageSize] = useState("1024x1024");
 
     const generateImage = async () => {
+        setrateLimited(false);
         setImageSize(imageSize);
         setPlaceholder(`Search ${prompt}...`);
         setPrompt(prompt);
@@ -34,11 +36,18 @@ function App() {
                     size: imageSize,
                 }),
             });
-
-            const data = await response.json();
+            if (response.status === 429) {
+                setrateLimited(true);
+                setRateLimitedMessage(await response.text());
+            }
+            var data;
+            try {
+                data = await response.json();
+            } catch (error) {
+                throw new Error("Something went wrong. Please try again later.");
+            }
 
             setLoading(false);
-            setResult(data.data);
 
             // Retrieve existing links from local storage
             const existingLinks = JSON.parse(localStorage.getItem("imageLinks")) || [];
@@ -69,6 +78,8 @@ function App() {
                 </>
             ) : (
                 <>
+                    {rateLimited ? <div class="alert">{rateLimitedMessage}</div> : null}
+
                     <h2>Generate Images using AI</h2>
                     <textarea
                         className="app-input"
@@ -99,7 +110,6 @@ function App() {
                     <button onClick={generateImage} id="generate">
                         Generate Images
                     </button>
-                    <h4>Your gallery:</h4>
                     <DisplayImages />
                 </>
             )}
