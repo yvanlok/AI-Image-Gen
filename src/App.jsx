@@ -1,10 +1,11 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import "./App.css";
 import { DisplayImages } from "./Images";
 
 function App() {
+    // State variables to manage various aspects of the app
     const [rateLimitedMessage, setRateLimitedMessage] = useState(null);
-    const [rateLimited, setrateLimited] = useState(false);
+    const [rateLimited, setRateLimited] = useState(false);
     const [prompt, setPrompt] = useState("");
     const [loading, setLoading] = useState(false);
     const [placeholder, setPlaceholder] = useState(
@@ -13,13 +14,15 @@ function App() {
     const [quantity, setQuantity] = useState(3);
     const [imageSize, setImageSize] = useState("1024x1024");
 
+    // Function to generate images using AI
     const generateImage = async () => {
-        setrateLimited(false);
-        setImageSize(imageSize);
-        setPlaceholder(`Search ${prompt}...`);
-        setPrompt(prompt);
-        setLoading(true);
+        setRateLimited(false); // Reset rate limit status
+        setImageSize(imageSize); // Update image size state
+        setPlaceholder(`Search ${prompt}...`); // Update placeholder text
+        setPrompt(prompt); // Update prompt state
+        setLoading(true); // Start loading state
 
+        // Fetch API URL and API Key from environment variables
         const apiUrl = import.meta.env.VITE_Open_AI_Url;
         const openaiApiKey = import.meta.env.VITE_Open_AI_Key;
         try {
@@ -36,18 +39,16 @@ function App() {
                     size: imageSize,
                 }),
             });
+
             if (response.status === 429) {
-                setrateLimited(true);
+                setRateLimited(true);
                 setRateLimitedMessage(await response.text());
             }
-            var data;
-            try {
-                data = await response.json();
-            } catch (error) {
-                throw new Error("Something went wrong. Please try again later.");
-            }
 
-            setLoading(false);
+            // Parse response data
+            const data = await response.json();
+
+            setLoading(false); // End loading state
 
             // Retrieve existing links from local storage
             const existingLinks = JSON.parse(localStorage.getItem("imageLinks")) || [];
@@ -78,7 +79,7 @@ function App() {
                 </>
             ) : (
                 <>
-                    {rateLimited ? <div class="alert">{rateLimitedMessage}</div> : null}
+                    {rateLimited ? <div className="alert">{rateLimitedMessage}</div> : null}
 
                     <h2>Generate Images using AI</h2>
                     <textarea
@@ -90,8 +91,8 @@ function App() {
                         autoFocus
                         onKeyDown={(e) => {
                             if (e.key === "Enter") {
-                                e.preventDefault(); // Prevent a line break from being added to the textarea
-                                document.getElementById("generate").click(); // Trigger a click event on the button
+                                e.preventDefault();
+                                document.getElementById("generate").click();
                             }
                         }}
                     />
