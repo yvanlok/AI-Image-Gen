@@ -80,11 +80,12 @@ function App() {
     const modelMaxImages = {
       "kandinsky-2.2": 10,
       "kandinsky-2": 10,
-      sdxl: 5,
+      "sdxl": 5,
       "stable-diffusion-2.1": 10,
       "stable-diffusion-1.5": 10,
       "deepfloyd-if": 4,
       "material-diffusion": 8,
+      "dall-e": 10,
     };
     setQuantity(Math.min(quantity, modelMaxImages[e.target.value])); // Limit quantity to model's max images
     setMaxQuantity(modelMaxImages[e.target.value]); // Limit quantity to model's max images
@@ -118,6 +119,7 @@ function App() {
               <option value="stable-diffusion-1.5">Stable Diffusion 1.5</option>
               <option value="deepfloyd-if">Deepfloyd IF</option>
               <option value="material-diffusion">Material Diffusion</option>
+              <option value="dall-e">DALL-E</option>
             </select>
           </div>
 
