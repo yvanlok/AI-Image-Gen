@@ -1,31 +1,26 @@
 import React, { useState } from "react";
 import "./App.css";
 import { DisplayImages } from "./Images";
+import ImageDownloader from "./ImagesDownload";
 
 function App() {
-  // State variables to manage various aspects of the app
   const [requestErrorMessage, setRequestErrorMessage] = useState(null);
   const [requestError, setRequestError] = useState(false);
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
-  const [placeholder, setPlaceholder] = useState(
-    "Search Bears with Paint Brushes the Starry Night, painted by Vincent Van Gogh..."
-  );
-  const [quantity, setQuantity] = useState(3);
+  const [placeholder, setPlaceholder] = useState("Search Bears with Paint Brushes the Starry Night, painted by Vincent Van Gogh...");
+  const [quantity, setQuantity] = useState(5);
   const [imageSize, setImageSize] = useState("1024x1024");
-  const [model, setModel] = useState("kandinsky-2.2"); // Default model
-  const [maxQuantity, setMaxQuantity] = useState(10);
+  const [model, setModel] = useState("sdxl");
+  const [maxQuantity, setMaxQuantity] = useState(5);
 
-  // Function to generate images using AI
-  // Function to generate images using AI
   const generateImage = async () => {
-    setRequestError(false); // Reset rate limit status
-    setImageSize(imageSize); // Update image size state
-    setPlaceholder(`Search ${prompt}...`); // Update placeholder text
-    setPrompt(prompt); // Update prompt state
-    setLoading(true); // Start loading state
+    setRequestError(false);
+    setImageSize(imageSize);
+    setPlaceholder(`Search ${prompt}...`);
+    setPrompt(prompt);
+    setLoading(true);
 
-    // Fetch API URL and API Key from environment variables
     const apiUrl = import.meta.env.VITE_Open_AI_Url;
     const openaiApiKey = import.meta.env.VITE_Open_AI_Key;
     try {
@@ -46,26 +41,21 @@ function App() {
       if (!response.ok) {
         setRequestError(true);
         try {
-          setRequestErrorMessage(await JSON.parse(response.text()).detail);
+          setRequestErrorMessage(await JSON.parse(response.text()).error);
         } catch (e) {
           setRequestErrorMessage(await response.text());
         }
       }
 
-      // Parse response data
       const data = await response.json();
 
-      setLoading(false); // End loading state
+      setLoading(false);
 
-      // Retrieve existing links from local storage
-      const existingLinks =
-        JSON.parse(localStorage.getItem("imageLinks")) || [];
+      const existingLinks = JSON.parse(localStorage.getItem("imageLinks")) || [];
 
-      // Extract new links from the data and append to existing links
       const newLinks = data.data.map((image) => image.url);
       const allLinks = [...newLinks, ...existingLinks];
 
-      // Save the updated links to local storage
       localStorage.setItem("imageLinks", JSON.stringify(allLinks));
     } catch (error) {
       setLoading(false);
@@ -73,22 +63,20 @@ function App() {
     }
   };
 
-  // Function to handle model selection
   const handleModelSelect = (e) => {
     setModel(e.target.value);
-    // Update max image quantity based on selected model
     const modelMaxImages = {
       "kandinsky-2.2": 10,
       "kandinsky-2": 10,
-      "sdxl": 5,
+      sdxl: 5,
       "stable-diffusion-2.1": 10,
       "stable-diffusion-1.5": 10,
       "deepfloyd-if": 4,
       "material-diffusion": 8,
       "dall-e": 10,
     };
-    setQuantity(Math.min(quantity, modelMaxImages[e.target.value])); // Limit quantity to model's max images
-    setMaxQuantity(modelMaxImages[e.target.value]); // Limit quantity to model's max images
+    setQuantity(Math.min(quantity, modelMaxImages[e.target.value]));
+    setMaxQuantity(modelMaxImages[e.target.value]);
   };
 
   return (
@@ -105,9 +93,7 @@ function App() {
         </>
       ) : (
         <>
-          {requestError ? (
-            <div className="alert">{requestErrorMessage}</div>
-          ) : null}
+          {requestError ? <div className="alert">{requestErrorMessage}</div> : null}
 
           <h2>Generate Images using Different AI Models</h2>
           <div className="select-container">
@@ -119,8 +105,10 @@ function App() {
               <option value="stable-diffusion-1.5">Stable Diffusion 1.5</option>
               <option value="deepfloyd-if">Deepfloyd IF</option>
               <option value="material-diffusion">Material Diffusion</option>
-              <option value="dall-e">DALL-E</option>
+              <option value="dall-e">DALL-E</option>        
             </select>
+
+            <ImageDownloader />
           </div>
 
           <textarea
@@ -138,14 +126,7 @@ function App() {
             }}
           />
           <label htmlFor="quantity">Number of Images:</label>
-          <input
-            id="quantity"
-            type="range"
-            min="1"
-            max={maxQuantity}
-            value={quantity}
-            onChange={(e) => setQuantity(parseInt(e.target.value))}
-          />
+          <input id="quantity" type="range" min="1" max={maxQuantity} value={quantity} onChange={(e) => setQuantity(parseInt(e.target.value))} />
           <span>{quantity}</span>
 
           <br />
