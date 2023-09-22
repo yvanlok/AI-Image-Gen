@@ -6,14 +6,14 @@ class ImageDownloader extends React.Component {
     const imageLinks = JSON.parse(localStorage.getItem("imageLinks"));
 
     if (!imageLinks || imageLinks.length === 0) {
-      alert("No image links found in localStorage.");
+      alert("No images to download found!");
       return;
     }
 
     const zip = new JSZip();
 
     const promises = imageLinks.map((link, index) => {
-      return fetch(`https://cors-anywhere.herokuapp.com/${link}`)
+      return fetch(link)
         .then((response) => response.blob())
         .then((blob) => {
           zip.file(`image${index + 1}.png`, blob);
