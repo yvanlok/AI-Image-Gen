@@ -40,11 +40,7 @@ function App() {
 
       if (!response.ok) {
         setRequestError(true);
-        try {
-          setRequestErrorMessage(await JSON.parse(response.text()).error);
-        } catch (e) {
-          setRequestErrorMessage(await response.text());
-        }
+        setRequestErrorMessage(await response.text());
       }
 
       const data = await response.json();
@@ -74,6 +70,7 @@ function App() {
       "deepfloyd-if": 4,
       "material-diffusion": 8,
       "dall-e": 10,
+      dalle3: 10,
     };
     setQuantity(Math.min(quantity, modelMaxImages[e.target.value]));
     setMaxQuantity(modelMaxImages[e.target.value]);
@@ -105,7 +102,8 @@ function App() {
               <option value="stable-diffusion-1.5">Stable Diffusion 1.5</option>
               <option value="deepfloyd-if">Deepfloyd IF</option>
               <option value="material-diffusion">Material Diffusion</option>
-              <option value="dall-e">DALL-E</option>        
+              <option value="dall-e">DALL-E</option>
+              <option value="dalle3">DALL-E 3</option>
             </select>
 
             <ImageDownloader />
