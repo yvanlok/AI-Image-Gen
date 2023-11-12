@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./App.css";
 import { DisplayImages } from "./Images";
 import ImageDownloader from "./ImagesDownload";
@@ -10,19 +10,35 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [placeholder, setPlaceholder] = useState("Search Bears with Paint Brushes the Starry Night, painted by Vincent Van Gogh...");
   const [quantity, setQuantity] = useState(5);
-  const [imageSize, setImageSize] = useState("1024x1024");
   const [model, setModel] = useState("sdxl");
   const [maxQuantity, setMaxQuantity] = useState(5);
 
+  const [imageModels, setImageModels] = useState([]);
+
+  useEffect(() => {
+    const fetchImageModels = async () => {
+      const apiUrl = `${import.meta.env.VITE_OPEN_AI_BASE}/v1/models`;
+      try {
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+        const imageModels = data.data.filter((model) => model.type === "image");
+        setImageModels(imageModels);
+      } catch (error) {
+        console.error("Error fetching image models:", error);
+      }
+    };
+
+    fetchImageModels();
+  }, []);
+
   const generateImage = async () => {
     setRequestError(false);
-    setImageSize(imageSize);
     setPlaceholder(`Search ${prompt}...`);
     setPrompt(prompt);
     setLoading(true);
 
-    const apiUrl = import.meta.env.VITE_Open_AI_Url;
-    const openaiApiKey = import.meta.env.VITE_Open_AI_Key;
+    const apiUrl = `${import.meta.env.VITE_OPEN_AI_BASE}/v1/images/generations`;
+    const openaiApiKey = import.meta.env.VITE_OPEN_AI_KEY;
     try {
       const response = await fetch(apiUrl, {
         method: "POST",
@@ -34,13 +50,13 @@ function App() {
           model: model,
           prompt: prompt,
           n: quantity,
-          size: imageSize,
         }),
       });
 
       if (!response.ok) {
         setRequestError(true);
-        setRequestErrorMessage(await response.text());
+        const errorMessage = await response.json();
+        setRequestErrorMessage(await errorMessage.error.message);
       }
 
       const data = await response.json();
@@ -60,20 +76,14 @@ function App() {
   };
 
   const handleModelSelect = (e) => {
-    setModel(e.target.value);
-    const modelMaxImages = {
-      "kandinsky-2.2": 10,
-      "kandinsky-2": 10,
-      sdxl: 5,
-      "stable-diffusion-2.1": 10,
-      "stable-diffusion-1.5": 10,
-      "deepfloyd-if": 4,
-      "material-diffusion": 8,
-      "dall-e": 10,
-      dalle3: 10,
-    };
-    setQuantity(Math.min(quantity, modelMaxImages[e.target.value]));
-    setMaxQuantity(modelMaxImages[e.target.value]);
+    const selectedModelId = e.target.value;
+    const selectedModel = imageModels.find((model) => model.id === selectedModelId);
+    setModel(selectedModelId);
+
+    if (selectedModel) {
+      setMaxQuantity(selectedModel.max_images);
+    }
+    setQuantity(Math.min(quantity, maxQuantity));
   };
 
   return (
@@ -95,15 +105,11 @@ function App() {
           <h2>Generate Images using Different AI Models</h2>
           <div className="select-container">
             <select value={model} onChange={handleModelSelect}>
-              <option value="kandinsky-2.2">Kandinsky 2.2</option>
-              <option value="kandinsky-2">Kandinsky 2</option>
-              <option value="sdxl">SDXL</option>
-              <option value="stable-diffusion-2.1">Stable Diffusion 2.1</option>
-              <option value="stable-diffusion-1.5">Stable Diffusion 1.5</option>
-              <option value="deepfloyd-if">Deepfloyd IF</option>
-              <option value="material-diffusion">Material Diffusion</option>
-              <option value="dall-e">DALL-E</option>
-              <option value="dalle3">DALL-E 3</option>
+              {imageModels.map((imageModel) => (
+                <option key={imageModel.id} value={imageModel.id}>
+                  {imageModel.id}
+                </option>
+              ))}
             </select>
 
             <ImageDownloader />
