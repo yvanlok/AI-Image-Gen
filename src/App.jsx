@@ -21,7 +21,7 @@ function App() {
       try {
         const response = await fetch(apiUrl);
         const data = await response.json();
-        const imageModels = data.data.filter((model) => model.type === "image");
+        const imageModels = data.data.filter((model) => model.max_images);
         setImageModels(imageModels);
       } catch (error) {
         console.error("Error fetching image models:", error);
