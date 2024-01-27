@@ -37,7 +37,7 @@ function App() {
     setPrompt(prompt);
     setLoading(true);
 
-    const apiUrl = `${import.meta.env.VITE_OPEN_AI_BASE}/v1/images/generations`;
+    const apiUrl = `${import.meta.env.VITE_OPEN_AI_BASE}/images/generations`;
     const openaiApiKey = import.meta.env.VITE_OPEN_AI_KEY;
     try {
       const response = await fetch(apiUrl, {
