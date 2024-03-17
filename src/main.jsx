@@ -12,7 +12,6 @@ const client = supabase;
 
 function Main() {
   const [session, setSession] = useState(null);
-
   useEffect(() => {
     client.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
@@ -26,14 +25,15 @@ function Main() {
 
     return () => subscription.unsubscribe();
   }, []);
-
   return (
     <React.StrictMode>
       {session ? (
         <App />
       ) : (
-        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh", width: "35%" }}>
-          <Auth supabaseClient={client} appearance={{ theme: ThemeSupa }} providers={["google", "github"]} />
+        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+          <div style={{ width: "35%" }}>
+            <Auth supabaseClient={client} appearance={{ theme: ThemeSupa }} providers={["google", "github"]} redirectTo="https://images.ylokh.xyz" />
+          </div>
         </div>
       )}
     </React.StrictMode>
