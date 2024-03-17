@@ -2,18 +2,32 @@ import React, { useState, useEffect } from "react";
 import "./App.css";
 import { DisplayImages } from "./Images";
 import ImageDownloader from "./ImagesDownload";
+import { supabase } from "./supabaseClient";
+
+const client = supabase;
 
 function App() {
   const [requestErrorMessage, setRequestErrorMessage] = useState(null);
   const [requestError, setRequestError] = useState(false);
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
-  const [placeholder, setPlaceholder] = useState("Search Bears with Paint Brushes the Starry Night, painted by Vincent Van Gogh...");
+  const [placeholder, setPlaceholder] = useState("Generate: Bears with Paint Brushes the Starry Night, painted by Vincent Van Gogh...");
   const [quantity, setQuantity] = useState(5);
   const [model, setModel] = useState("sdxl");
   const [maxQuantity, setMaxQuantity] = useState(5);
-
   const [imageModels, setImageModels] = useState([]);
+
+  const getIdToken = async () => {
+    const session = await client.auth.getSession();
+
+    if (session?.data?.session) {
+      const token = session.data.session.access_token;
+      return token;
+    }
+
+    console.error("Invalid session.");
+    return "";
+  };
 
   useEffect(() => {
     const fetchImageModels = async () => {
@@ -33,11 +47,13 @@ function App() {
 
   const generateImage = async () => {
     setRequestError(false);
-    setPlaceholder(`Search ${prompt}...`);
+    setPlaceholder(`Generate: ${prompt}...`);
     setPrompt(prompt);
     setLoading(true);
 
-    const apiUrl = `${import.meta.env.VITE_OPEN_AI_BASE}/v1/images/generations`;
+    const token = await getIdToken();
+
+    const apiUrl = `${import.meta.env.VITE_OPEN_AI_BASE}/images/generations`;
     const openaiApiKey = import.meta.env.VITE_OPEN_AI_KEY;
     try {
       const response = await fetch(apiUrl, {
@@ -50,6 +66,7 @@ function App() {
           model: model,
           prompt: prompt,
           n: quantity,
+          token: token,
         }),
       });
 
@@ -102,7 +119,7 @@ function App() {
         <>
           {requestError ? <div className="alert">{requestErrorMessage}</div> : null}
 
-          <h2>Generate Images using Different AI Models</h2>
+          <h2>Simple AI Image Generator</h2>
           <div className="select-container">
             <select value={model} onChange={handleModelSelect}>
               {imageModels.map((imageModel) => (
