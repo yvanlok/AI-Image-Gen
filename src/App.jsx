@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import "./App.css";
-import { DisplayImages } from "./Images";
+import { DisplayImages } from "./DisplayImages.jsx";
 import ImageDownloader from "./ImagesDownload";
-import { supabase } from "./supabaseClient";
-
-const client = supabase;
+import { getIdToken } from "./Utils.js";
+import { fetchImageModels, generateImage } from "./Api.js";
 
 function App() {
   const [requestErrorMessage, setRequestErrorMessage] = useState(null);
@@ -17,35 +16,16 @@ function App() {
   const [maxQuantity, setMaxQuantity] = useState(5);
   const [imageModels, setImageModels] = useState([]);
 
-  const getIdToken = async () => {
-    const session = await client.auth.getSession();
-
-    if (session?.data?.session) {
-      const token = session.data.session.access_token;
-      return token;
-    }
-
-    console.error("Invalid session.");
-    return "";
-  };
-
   useEffect(() => {
-    const fetchImageModels = async () => {
-      const apiUrl = `${import.meta.env.VITE_OPEN_AI_BASE}/v1/models`;
-      try {
-        const response = await fetch(apiUrl);
-        const data = await response.json();
-        const imageModels = data.data.filter((model) => model.max_images);
-        setImageModels(imageModels);
-      } catch (error) {
-        console.error("Error fetching image models:", error);
-      }
+    const fetchModels = async () => {
+      const models = await fetchImageModels();
+      setImageModels(models);
     };
 
-    fetchImageModels();
+    fetchModels();
   }, []);
 
-  const generateImage = async () => {
+  const handleGenerateImage = useCallback(async () => {
     setRequestError(false);
     setPlaceholder(`Generate: ${prompt}...`);
     setPrompt(prompt);
@@ -53,44 +33,20 @@ function App() {
 
     const token = await getIdToken();
 
-    const apiUrl = `${import.meta.env.VITE_OPEN_AI_BASE}/images/generations`;
-    const openaiApiKey = import.meta.env.VITE_OPEN_AI_KEY;
-    try {
-      const response = await fetch(apiUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${openaiApiKey}`,
-        },
-        body: JSON.stringify({
-          model: model,
-          prompt: prompt,
-          n: quantity,
-          token: token,
-        }),
-      });
+    const result = await generateImage(model, prompt, quantity, token);
 
-      if (!response.ok) {
-        setRequestError(true);
-        const errorMessage = await response.json();
-        setRequestErrorMessage(await errorMessage.error.message);
-      }
-
-      const data = await response.json();
-
-      setLoading(false);
-
+    if (result.error) {
+      setRequestError(true);
+      setRequestErrorMessage(result.error);
+    } else {
       const existingLinks = JSON.parse(localStorage.getItem("imageLinks")) || [];
-
-      const newLinks = data.data.map((image) => image.url);
+      const newLinks = result.data.map((image) => image.url.split("?")[0]);
       const allLinks = [...newLinks, ...existingLinks];
-
       localStorage.setItem("imageLinks", JSON.stringify(allLinks));
-    } catch (error) {
-      setLoading(false);
-      console.log(error);
     }
-  };
+
+    setLoading(false);
+  }, [model, prompt, quantity]);
 
   const handleModelSelect = (e) => {
     const selectedModelId = e.target.value;
@@ -151,7 +107,7 @@ function App() {
           <span>{quantity}</span>
 
           <br />
-          <button onClick={generateImage} id="generate">
+          <button onClick={handleGenerateImage} id="generate">
             Generate Images
           </button>
           <DisplayImages />

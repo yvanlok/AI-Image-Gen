@@ -1,0 +1,41 @@
+.image-card {
+  position: relative;
+  display: inline-block;
+}
+
+.result-image {
+  display: block;
+  width: 400px; /* adjust this to your liking */
+  height: auto;
+}
+
+.image-overlay {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  width: 100%;
+  opacity: 0;
+  transition: 0.5s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.image-card:hover .image-overlay {
+  opacity: 1;
+}
+
+.image-overlay button {
+  color: white;
+  font-size: 12px;
+  transition: 0.3s;
+  margin: 5px;
+}
+
+.image-overlay button:hover {
+  color: #bbb;
+}
