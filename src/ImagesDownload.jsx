@@ -14,7 +14,7 @@ class ImageDownloader extends React.Component {
 
     try {
       const promises = imageLinks.map(async (link, index) => {
-        const corsProxy = "https://cors-anywhere.herokuapp.com/";
+        const corsProxy = "https://cors-anywhere-6iul.onrender.com/";
         const response = await fetch(corsProxy + link);
         const blob = await response.blob();
         zip.file(`image${index + 1}.png`, blob);

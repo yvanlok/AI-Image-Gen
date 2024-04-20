@@ -33,14 +33,14 @@ function App() {
 
     const token = await getIdToken();
 
-    const result = await generateImage(model, prompt, quantity, token);
+    const response = await generateImage(model, prompt, quantity, token);
 
-    if (result.error) {
+    if (!response.ok) {
       setRequestError(true);
-      setRequestErrorMessage(result.error);
+      setRequestErrorMessage(response.statusText);
     } else {
       const existingLinks = JSON.parse(localStorage.getItem("imageLinks")) || [];
-      const newLinks = result.data.map((image) => image.url.split("?")[0]);
+      const newLinks = response.json().data.map((image) => image.url.split("?")[0]);
       const allLinks = [...newLinks, ...existingLinks];
       localStorage.setItem("imageLinks", JSON.stringify(allLinks));
     }

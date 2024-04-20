@@ -11,32 +11,20 @@ export const fetchImageModels = async () => {
 };
 
 export const generateImage = async (model, prompt, quantity, token) => {
-  const apiUrl = `${import.meta.env.VITE_OPEN_AI_BASE}/images/generations`;
-  const openaiApiKey = import.meta.env.VITE_OPEN_AI_KEY;
+  const apiUrl = `${import.meta.env.VITE_OPEN_AI_BASE}/v1/images/generations`;
 
-  try {
-    const response = await fetch(apiUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${openaiApiKey}`,
-      },
-      body: JSON.stringify({
-        model: model,
-        prompt: prompt,
-        n: quantity,
-        token: token,
-      }),
-    });
+  const response = await fetch(apiUrl, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: model,
+      prompt: prompt,
+      n: quantity,
+      token: token,
+    }),
+  });
 
-    if (!response.ok) {
-      const errorMessage = await response.json();
-      return { error: errorMessage };
-    }
-
-    const data = await response.json();
-    return { data: data.data };
-  } catch (error) {
-    console.log(error);
-  }
+  return response;
 };
